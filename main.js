@@ -14,16 +14,19 @@ function onSubmit(e){
     msg.innerHTML = 'Please enter fields'
     setTimeout(()=>msg.remove(),3000);
  }else{
-    // const li = document.createElement('li');
-    // li.appendChild(document.createTextNode(`${nameInput.value} : ${emailInput.value}`));
-    // userList.appendChild(li);
+   
+    var uniqueKey = emailInput.value + Date.now();
     myObj = {
         name:nameInput.value,
         email:emailInput.value
     };
-    localStorage.setItem('myObj',JSON.stringify(myObj));
+    localStorage.setItem(uniqueKey, JSON.stringify(myObj));
+
+    const li = document.createElement('li');
+    li.appendChild(document.createTextNode(`Name:- ${myObj.name} ,emailID:- ${myObj.email}`));
+     userList.appendChild(li);
     nameInput.value = '';
     emailInput.value= '';
-   console.log(localStorage)
+   //console.log(localStorage)
  }
 }
