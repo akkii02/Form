@@ -17,10 +17,13 @@ function onSubmit(e){
     // const li = document.createElement('li');
     // li.appendChild(document.createTextNode(`${nameInput.value} : ${emailInput.value}`));
     // userList.appendChild(li);
-    localStorage.setItem('name',nameInput.value);
-    localStorage.setItem('email',emailInput.value)
+    myObj = {
+        name:nameInput.value,
+        email:emailInput.value
+    };
+    localStorage.setItem('myObj',JSON.stringify(myObj));
     nameInput.value = '';
     emailInput.value= '';
-   // console.log(localStorage.getItem('email'))
+   console.log(localStorage)
  }
 }
