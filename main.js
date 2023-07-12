@@ -7,6 +7,7 @@ const userList = document.querySelector("#users");
 
 myForm.addEventListener("submit", onSubmit);
 userList.addEventListener("click", removeItem);
+userList.addEventListener('click',editItem);
 
 function onSubmit(e) {
   e.preventDefault();
@@ -37,10 +38,16 @@ function onSubmit(e) {
       )
     );
     userList.appendChild(li);
-    var editBtn = document.createElement("button");
-    editBtn.className = "deleteBtn delete";
-    editBtn.appendChild(document.createTextNode("Delete"));
-    li.appendChild(editBtn);
+    var deleteItems = document.createElement("button");
+    deleteItems.className = "deleteBtn delete";
+    deleteItems.appendChild(document.createTextNode("Delete"));
+    li.appendChild(deleteItems);
+
+    var editItems = document.createElement("button");
+    editItems.className = "editBtn edit";
+    editItems.appendChild(document.createTextNode("Edit"));
+    li.appendChild(editItems);
+
     nameInput.value = "";
     emailInput.value = "";
     phoneNumber.value = "";
@@ -53,6 +60,22 @@ function removeItem(e) {
     if (confirm("Are You Sure?")) {
       var li = e.target.parentElement;
       userList.removeChild(li);
+      localStorage.removeItem(myObj.email);
+    }
+    // console.log(1)
+  }
+}
+
+function editItem(e) {
+  if (e.target.classList.contains("edit")) {
+    if (confirm("Are You Sure?")) {
+      nameInput.value = myObj.name;
+      emailInput.value = myObj.email;
+      phoneNumber.value = myObj.number;
+
+      var li = e.target.parentElement;
+      userList.removeChild(li);
+
       localStorage.removeItem(myObj.email);
     }
     // console.log(1)
