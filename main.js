@@ -23,7 +23,7 @@ function onSubmit(e) {
       number: phoneNumber.value,
     };
 
-    axios.post('https://crudcrud.com/api/e83cd81d5a734a5d857fb20bb9872012/apponmentData',myObj)
+    axios.post('https://crudcrud.com/api/60ee11b6ae4141c5b026b93ad689a766/apponmentData',myObj)
     .then((res)=>{
       addUserToList(res.data)
       console.log(res)
@@ -45,15 +45,26 @@ function onSubmit(e) {
   }
 }
 
-window.addEventListener('load',loadData)
+window.addEventListener('DOMContentLoaded',loadData)
 
 
   function loadData() {
-    for (let i = 0; i < localStorage.length; i++) {
-      const email = localStorage.key(i);
-      const storedData = JSON.parse(localStorage.getItem(email));
-      addUserToList(storedData);
-    }
+    // for (let i = 0; i < localStorage.length; i++) {
+    //   const email = localStorage.key(i);
+    //   const storedData = JSON.parse(localStorage.getItem(email));
+    //   addUserToList(storedData);
+    // }
+    axios.get('https://crudcrud.com/api/60ee11b6ae4141c5b026b93ad689a766/apponmentData')
+    .then(response => {
+      const userData = response.data; 
+      userData.forEach(user => {
+        addUserToList(user);
+      });
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error);
+    });
+
   }
 
 
@@ -110,10 +121,4 @@ function editUser(e) {
   }
 }
 
-userList.addEventListener("click", function (e) {
-  if (e.target.classList.contains("delete")) {
-    deleteUser(e);
-  } else if (e.target.classList.contains("edit")) {
-    editUser(e);
-  }
-});
+
