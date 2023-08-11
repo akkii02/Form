@@ -5,8 +5,6 @@ const phoneNumber = document.querySelector("#number");
 const msg = document.querySelector(".msg");
 const userList = document.querySelector("#users");
 
-
-
 myForm.addEventListener("submit", onSubmit);
 
 function onSubmit(e) {
@@ -23,21 +21,14 @@ function onSubmit(e) {
       number: phoneNumber.value,
     };
 
-    axios.post('https://crudcrud.com/api/60ee11b6ae4141c5b026b93ad689a766/apponmentData',myObj)
-    .then((res)=>{
-      addUserToList(res.data)
-      console.log(res)
-    })
-    .catch((err)=>{
-      console.log(err)
-    })
-
-
-
-
-    // localStorage.setItem(emailInput.value, JSON.stringify(myObj));
-
-    //addUserToList(myObj);
+    axios.post('https://crudcrud.com/api/760426c39bfd437aaa306ec34c75a9d9/apponmentData', myObj)
+      .then((res) => {
+        addUserToList(res.data);
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
 
     nameInput.value = "";
     emailInput.value = "";
@@ -45,16 +36,10 @@ function onSubmit(e) {
   }
 }
 
-window.addEventListener('DOMContentLoaded',loadData)
+window.addEventListener('DOMContentLoaded', loadData);
 
-
-  function loadData() {
-    // for (let i = 0; i < localStorage.length; i++) {
-    //   const email = localStorage.key(i);
-    //   const storedData = JSON.parse(localStorage.getItem(email));
-    //   addUserToList(storedData);
-    // }
-    axios.get('https://crudcrud.com/api/60ee11b6ae4141c5b026b93ad689a766/apponmentData')
+function loadData() {
+  axios.get('https://crudcrud.com/api/760426c39bfd437aaa306ec34c75a9d9/apponmentData')
     .then(response => {
       const userData = response.data; 
       userData.forEach(user => {
@@ -64,13 +49,11 @@ window.addEventListener('DOMContentLoaded',loadData)
     .catch(error => {
       console.error('Error fetching data:', error);
     });
-
-  }
-
+}
 
 function addUserToList(userObj) {
   const li = document.createElement("li");
-  li.setAttribute("data-id", userObj.email);
+  li.setAttribute("data-id", userObj._id);
 
   li.appendChild(
     document.createTextNode(
@@ -81,6 +64,11 @@ function addUserToList(userObj) {
   const deleteButton = createButton("Delete", "deleteBtn delete");
   deleteButton.addEventListener("click", deleteUser);
   li.appendChild(deleteButton);
+
+  const deleteIcon = document.createElement("i");
+  deleteIcon.className = "fas fa-trash-alt delete-icon"; 
+  deleteIcon.addEventListener("click", deleteUserIcon);
+  li.appendChild(deleteIcon);
 
   const editButton = createButton("Edit", "editBtn edit");
   editButton.addEventListener("click", editUser);
@@ -101,7 +89,31 @@ function deleteUser(e) {
     const li = e.target.parentElement;
     const email = li.getAttribute("data-id");
     userList.removeChild(li);
-    localStorage.removeItem(email);
+
+    
+    axios.delete(`https://crudcrud.com/api/760426c39bfd437aaa306ec34c75a9d9/apponmentData/${email}`)
+      .then(() => {
+        console.log("User deleted successfully");
+      })
+      .catch(error => {
+        console.error('Error deleting user:', error);
+      });
+  }
+}
+
+function deleteUserIcon(e) {
+  if (confirm("Are You Sure?")) {
+    const li = e.target.parentElement;
+    const userId = li.getAttribute("data-id");
+
+    
+    axios.delete(`https://crudcrud.com/api/760426c39bfd437aaa306ec34c75a9d9/apponmentData/${userId}`)
+      .then(() => {
+        userList.removeChild(li); 
+      })
+      .catch(error => {
+        console.error('Error deleting user:', error);
+      });
   }
 }
 
@@ -120,5 +132,3 @@ function editUser(e) {
     localStorage.removeItem(email);
   }
 }
-
-
