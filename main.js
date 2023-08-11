@@ -4,6 +4,8 @@ const emailInput = document.querySelector("#email");
 const phoneNumber = document.querySelector("#number");
 const msg = document.querySelector(".msg");
 const userList = document.querySelector("#users");
+let isEditing = false;
+let editingUserId = null;
 
 myForm.addEventListener("submit", onSubmit);
 
@@ -12,27 +14,40 @@ function onSubmit(e) {
 
   if (nameInput.value === "" || emailInput.value === "" || phoneNumber.value === "") {
     msg.classList.add("error");
-    msg.innerHTML = "Please enter fields";
+    msg.innerHTML = "Please enter all fields";
     setTimeout(() => msg.remove(), 3000);
   } else {
-    const myObj = {
+    const userData = {
       name: nameInput.value,
       email: emailInput.value,
-      number: phoneNumber.value,
+      number: phoneNumber.value
     };
 
-    axios.post('https://crudcrud.com/api/760426c39bfd437aaa306ec34c75a9d9/apponmentData', myObj)
-      .then((res) => {
-        addUserToList(res.data);
-        console.log(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    if (isEditing) {
+      axios.put(`https://crudcrud.com/api/760426c39bfd437aaa306ec34c75a9d9/apponmentData/${editingUserId}`, userData)
+        .then(response => {
+          console.log("User updated successfully");
+          loadData();
+        })
+        .catch(error => {
+          console.error('Error updating user:', error);
+        });
+    } else {
+      axios.post('https://crudcrud.com/api/760426c39bfd437aaa306ec34c75a9d9/apponmentData', userData)
+        .then(response => {
+          addUserToList(response.data);
+          console.log("User added successfully");
+        })
+        .catch(error => {
+          console.error('Error adding user:', error);
+        });
+    }
 
     nameInput.value = "";
     emailInput.value = "";
     phoneNumber.value = "";
+    isEditing = false;
+    editingUserId = null;
   }
 }
 
@@ -74,6 +89,11 @@ function addUserToList(userObj) {
   editButton.addEventListener("click", editUser);
   li.appendChild(editButton);
 
+  const editIcon = document.createElement("i");
+  editIcon.className = "fas fa-edit edit-icon";
+  editIcon.addEventListener("click", editUser);
+  li.appendChild(editIcon);
+
   userList.appendChild(li);
 }
 
@@ -87,11 +107,10 @@ function createButton(text, className) {
 function deleteUser(e) {
   if (confirm("Are You Sure?")) {
     const li = e.target.parentElement;
-    const email = li.getAttribute("data-id");
+    const userId = li.getAttribute("data-id");
     userList.removeChild(li);
 
-    
-    axios.delete(`https://crudcrud.com/api/760426c39bfd437aaa306ec34c75a9d9/apponmentData/${email}`)
+    axios.delete(`https://crudcrud.com/api/760426c39bfd437aaa306ec34c75a9d9/apponmentData/${userId}`)
       .then(() => {
         console.log("User deleted successfully");
       })
@@ -106,7 +125,6 @@ function deleteUserIcon(e) {
     const li = e.target.parentElement;
     const userId = li.getAttribute("data-id");
 
-    
     axios.delete(`https://crudcrud.com/api/760426c39bfd437aaa306ec34c75a9d9/apponmentData/${userId}`)
       .then(() => {
         userList.removeChild(li); 
@@ -118,17 +136,20 @@ function deleteUserIcon(e) {
 }
 
 function editUser(e) {
-  if (confirm("Are You Sure?")) {
-    const li = e.target.parentElement;
-    const email = li.getAttribute("data-id");
+  const li = e.target.parentElement;
+  const userId = li.getAttribute("data-id");
 
-    const storedData = JSON.parse(localStorage.getItem(email));
-
-    nameInput.value = storedData.name;
-    emailInput.value = storedData.email;
-    phoneNumber.value = storedData.number;
-
-    userList.removeChild(li);
-    localStorage.removeItem(email);
-  }
+  axios.get(`https://crudcrud.com/api/760426c39bfd437aaa306ec34c75a9d9/apponmentData/${userId}`)
+    .then(response => {
+      const userData = response.data;
+      nameInput.value = userData.name;
+      emailInput.value = userData.email;
+      phoneNumber.value = userData.number;
+      isEditing = true;
+      editingUserId = userId;
+      userList.removeChild(li);
+    })
+    .catch(error => {
+      console.error('Error fetching user data for editing:', error);
+    });
 }
